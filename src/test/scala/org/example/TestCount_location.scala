@@ -1,6 +1,7 @@
 package org.example
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
+import org.example.Count_location._
 import org.scalatest._
 
 class TestCount_location extends FunSuite {
@@ -11,20 +12,11 @@ class TestCount_location extends FunSuite {
     .getOrCreate()
   sparkSession.sparkContext.setLogLevel("ERROR")
 
-  val lines = sparkSession.read.csv("src/main/resources/user.csv")
-  val lines1 = sparkSession.read.csv("src/main/resources/transactions.csv")
-  val userColumns = Seq ("userid", "mailid", "language", "country")
+  val lines = read1(sparkSession.read.csv("src/main/resources/user.csv"))
+  val lines1 = read2(sparkSession.read.csv("src/main/resources/transactions.csv"))
 
-  val usertable = lines.toDF (userColumns: _*)
-  val transColumns = Seq ("transcationid", "productid", "userid", "price", "productdesc")
-  val transtable = lines1.toDF (transColumns: _*)
-
-
-  assert(Count_location.count(usertable,transtable)=== usertable.join (transtable, usertable ("userid") === transtable ("userid"), "inner")
+  assert(Count_location.count(lines,lines1)=== lines.join (lines1, lines ("userid") === lines1("userid"), "inner")
     .groupBy("country").count().show())
-  assert(Count_location.product_bought(transtable)=== transtable.groupBy("userid","productdesc").count() .show ())
-  assert(Count_location.Spending_eachuser(transtable)=== transtable.groupBy("userid","productid","productdesc").agg(sum("price")).show())
-
   sparkSession.stop()
 
 }

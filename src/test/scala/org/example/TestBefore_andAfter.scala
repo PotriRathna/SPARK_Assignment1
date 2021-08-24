@@ -9,11 +9,9 @@ class TestBefore_andAfter extends FunSuite with BeforeAndAfter{
     .getOrCreate()
   sparkSession.sparkContext.setLogLevel("ERROR")
   before {
-    val lines1 = sparkSession.read.csv("src/main/resources/transactions.csv")
-    val transColumns = Seq ("transcationid", "productid", "userid", "price", "productdesc")
-    val transtable = lines1.toDF (transColumns: _*)
-  test(" spending done by each user on each product"){
-    assert(Count_location.Spending_eachuser(transtable)=== transtable.groupBy("userid","productid","productdesc").agg(sum("price")).show())}
+    val lines1 = Count_location.read2(sparkSession.read.csv("src/main/resources/transactions.csv"))
+    test(" spending done by each user on each product"){
+    assert(Count_location.Spending_eachuser(lines1)=== lines1.groupBy("userid","productid","productdesc").agg(sum("price")).show())}
   }
   after {
     sparkSession.stop()

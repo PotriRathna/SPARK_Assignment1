@@ -12,13 +12,12 @@ class Test_Featurespec extends FeatureSpec with GivenWhenThen {
   feature("Read csv") {
     scenario("GroupBy") {
       Given("Count Products")
-      val lines1 = sparkSession.read.csv("src/main/resources/transactions.csv")
-      val transColumns = Seq ("transcationid", "productid", "userid", "price", "productdesc")
-      val transtable = lines1.toDF (transColumns: _*)
+      val lines1 = Count_location.read2(sparkSession.read.csv("src/main/resources/transactions.csv"))
       When("CSV to DF ")
-      val result= Count_location.product_bought(transtable)
+      val result= Count_location.product_bought(lines1)
       Then("we get correct result")
-      assert(result == transtable.groupBy("userid","productdesc").count() .show ())
+      assert(result == lines1.groupBy("userid","productdesc").count() .show ())
     }
   }
+
 }
