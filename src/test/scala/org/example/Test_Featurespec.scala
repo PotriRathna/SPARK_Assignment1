@@ -1,7 +1,10 @@
 package org.example
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SparkSession
 import org.scalatest._
 class Test_Featurespec extends FeatureSpec with GivenWhenThen {
+
+  Logger.getLogger("org").setLevel(Level.ERROR)
   var sparkSession : SparkSession  = SparkSession.builder()
     .master("local[*]")
     .appName("Jointable")
@@ -12,11 +15,12 @@ class Test_Featurespec extends FeatureSpec with GivenWhenThen {
   feature("Read csv") {
     scenario("GroupBy") {
       Given("Count Products")
-      val lines1 = Count_location.read2(sparkSession.read.csv("src/main/resources/transactions.csv"))
+      val lines1 = Count_location.readfile(sparkSession.read.csv("src/main/resources/transactions.csv"),Seq ("transcationid", "productid", "userid", "price", "productdesc"))
       When("CSV to DF ")
       val result= Count_location.product_bought(lines1)
       Then("we get correct result")
-      assert(result == lines1.groupBy("userid","productdesc").count() .show ())
+      assert(result.toString === lines1.select("productid", "userid")
+        .groupBy("userid").count().toString())
     }
   }
 
