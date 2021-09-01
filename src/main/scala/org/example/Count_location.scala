@@ -16,8 +16,8 @@ object Count_location extends App{
       .getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
 
-    val userdf = Service.readfile(spark.read.csv("src/main/resources/user.csv"),Seq ("userid", "mailid", "language", "country"))
-    val transdf = Service.readfile(spark.read.csv("src/main/resources/transactions.csv"),Seq ("transcationid", "productid", "userid", "price", "productdesc"))
+    val userdf = Service.readDF("src/main/resources/user.csv",Seq ("userid", "mailid", "language", "country"))
+    val transdf = Service.readDF("src/main/resources/transactions.csv",Seq ("transcationid", "productid", "userid", "price", "productdesc"))
 
     println(s"Count of unique locations where each product is sold ${Service.count(userdf,transdf).show()}" )
     println(s"Find out products bought by each user ${ Service.product_bought(transdf).show()}")
