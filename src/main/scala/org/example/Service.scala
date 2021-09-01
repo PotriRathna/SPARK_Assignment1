@@ -15,6 +15,9 @@ object Service {
   def Spending_eachuser(transdf:DataFrame):DataFrame= transdf.groupBy("userid","productid")
     .agg(sum("price")).withColumnRenamed("userid","User")
 
-  def readfile(file:DataFrame,col:Seq[String]):DataFrame= file.toDF(col:_*)
+  def readDF(Path: String, col: Seq[String])(implicit spark:SparkSession): DataFrame = {
+    val fileDF =spark.read.csv(Path)
+    fileDF.toDF(col:_*)
+  }
 
 }
